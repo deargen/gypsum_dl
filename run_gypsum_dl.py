@@ -86,13 +86,13 @@ python run_gypsum_dl.py --source ./examples/sample_molecules.smi \\
    separate files:
 
 python run_gypsum_dl.py --source ./examples/sample_molecules.smi \\
-    --output_folder /my/folder/ --separate_output_files
+    --output_folder /my/folder/ --separate_output_files True
 
 4. In addition to saving a 3D SDF file, also save 3D PDB files and an HTML file
    with 2D structures (for debugging).
 
 python run_gypsum_dl.py --source ./examples/sample_molecules.smi \\
-    --output_folder /my/folder/ --add_pdb_output --add_html_output
+    --output_folder /my/folder/ --add_pdb_output True --add_html_output True
 
 5. Save at most two variants per input molecule:
 
@@ -144,7 +144,7 @@ PARSER.add_argument(
     type=str,
     metavar="param.json",
     help="Name of a json file containing all parameters. \
-                    Overrides all other arguments specified at the commandline.",
+                Parameters will be overrided by arguments specified at the commandline.",
 )
 PARSER.add_argument(
     "--source",
@@ -163,7 +163,6 @@ PARSER.add_argument(
 PARSER.add_argument(
     "--job_manager",
     type=str,
-    default="multiprocessing",
     choices=["mpi", "multiprocessing", "serial"],
     help="Determine what style of multiprocessing to use: mpi, \
                         multiprocessing, or serial. Serial will override the \
@@ -177,7 +176,6 @@ PARSER.add_argument(
     "-p",
     type=int,
     metavar="N",
-    default=1,
     help="Number of processors to use for parallel \
                     calculations.",
 )
@@ -199,7 +197,7 @@ PARSER.add_argument(
 )
 PARSER.add_argument(
     "--separate_output_files",
-    action="store_true",
+    type=bool,
     help="Indicates that the outputs should be split between \
                     files. If true, each output .sdf file will correspond to a \
                     single input file, but different 3D conformers will still \
@@ -207,14 +205,14 @@ PARSER.add_argument(
 )
 PARSER.add_argument(
     "--add_pdb_output",
-    action="store_true",
+    type=bool,
     help="Indicates that the outputs should also be written in \
                     the .pdb format. Creates one PDB file for each molecular \
                     variant.",
 )
 PARSER.add_argument(
     "--add_html_output",
-    action="store_true",
+    type=bool,
     help="Indicates that the outputs should also be written in \
                     the .html format, for debugging. Attempts to open a \
                     browser for viewing.",
@@ -233,37 +231,36 @@ PARSER.add_argument(
                     publication for details.",
 )
 PARSER.add_argument(
-    "--skip_optimize_geometry", action="store_true", help="Skips the optimization step."
+    "--skip_optimize_geometry", type=bool, help="Skips the optimization step."
 )
 PARSER.add_argument(
-    "--skip_alternate_ring_conformations",
-    action="store_true",
+    "--skip_alternate_ring_conformations", type=bool,
     help="Skips the non-aromatic ring-conformation \
                     generation step.",
 )
 PARSER.add_argument(
-    "--skip_adding_hydrogen", action="store_true", help="Skips the ionization step."
+    "--skip_adding_hydrogen", type=bool, help="Skips the ionization step."
 )
 PARSER.add_argument(
-    "--skip_making_tautomers",
-    action="store_true",
+    "--skip_making_tautomers", 
+    type=bool,
     help="Skips tautomer-generation step.",
 )
 PARSER.add_argument(
-    "--skip_enumerate_chiral_mol",
-    action="store_true",
+    "--skip_enumerate_chiral_mol", 
+    type=bool,
     help="Skips the ennumeration of unspecified chiral \
                     centers.",
 )
 PARSER.add_argument(
     "--skip_enumerate_double_bonds",
-    action="store_true",
+    type=bool,
     help="Skips the ennumeration of double bonds.",
 )
 
 PARSER.add_argument(
     "--let_tautomers_change_chirality",
-    action="store_true",
+    type=bool,
     help="Allow tautomers that change \
                     the total number of chiral centers (see README.md for \
                     further explanation).",
@@ -271,7 +268,7 @@ PARSER.add_argument(
 
 PARSER.add_argument(
     "--use_durrant_lab_filters",
-    action="store_true",
+    type=bool,
     help="Use substructure filters to \
                     remove molecular variants that, though technically \
                     possible, were judged improbable by members of the \
@@ -279,16 +276,28 @@ PARSER.add_argument(
 )
 
 PARSER.add_argument(
-    "--2d_output_only", action="store_true", help="Skips the generate-3D-models step."
+    "--2d_output_only", type=bool, help="Skips the generate-3D-models step."
 )
+
+PARSER.add_argument(
+    "--max_confs_to_save",
+    type=int,
+    help="The maximum number of conformations to be saved per molecule.",
+)
+
 PARSER.add_argument(
     "--cache_prerun",
     "-c",
-    action="store_true",
+    type=bool,
+    default=False,
     help="Run this before running Gypsum-DL in mpi mode.",
 )
+
 PARSER.add_argument(
-    "--test", action="store_true", help="Tests Gypsum-DL to check for programming bugs."
+    "--test", 
+    type=bool,
+    default=False,
+    help="Tests Gypsum-DL to check for programming bugs."
 )
 
 ARGS_DICT = vars(PARSER.parse_args())
@@ -299,8 +308,9 @@ elif ARGS_DICT["cache_prerun"] == False:
     INPUTS = copy.deepcopy(ARGS_DICT)
 
     for k, v in ARGS_DICT.items():
-        if v is None:
+        if k in ["test", "cache_prerun"] or v is None :
             del INPUTS[k]
+    
     prepare_molecules(INPUTS)
     Utils.log("Finished Gypsum-DL")
 else:
