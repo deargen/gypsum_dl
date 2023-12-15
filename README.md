@@ -1,3 +1,23 @@
+# Usage for ligand preparaion (Deargen)
+
+
+## Example for ligand preparation
+```bash
+python run_gypsum_dl.py --json params/convert_to_3d.json --source glue_toy_screen_cpds.sdf --output_folder ./prep_1
+``` 
+<br/>
+
+## changes from original Gypsum-DL 1.2.1
+- Parameter specified by the json file will be overrieded by command-line arguments
+- --max_confs_to_save : Maximum number of conformations per a sinlge mol
+<br/>
+
+## note
+- One compound can have multipe molecule (MyMol) with different ionization states, tautomer states, isomeric conformations or non-aromatic ring conformations
+- One molecule (MyMol) can have multiple conformations
+
+<br/><br/>
+
 # Gypsum-DL 1.2.1
 
 Gypsum-DL is a free, open-source program for preparing 3D small-molecule
@@ -48,7 +68,7 @@ Gypsum-DL accepts the following command-line parameters:
   -h, --help            show this help message and exit
   --json param.json, -j param.json
                         Name of a json file containing all parameters.
-                        Overrides all other arguments specified at the
+                        Will be overrided by all other arguments specified at the
                         commandline.
   --source input.smi, -s input.smi
                         Name of the source file (e.g., input.smi). Note:
@@ -135,7 +155,7 @@ files:
 
 ```bash
 python run_gypsum_dl.py --source ./examples/sample_molecules.smi \
-    --output_folder /my/folder/ --separate_output_files
+    --output_folder /my/folder/ --separate_output_files True
 ```
 
 In addition to saving a 3D SDF file, also save 3D PDB files and an HTML file
@@ -143,7 +163,7 @@ with 2D structures (for debugging).
 
 ```bash
 python run_gypsum_dl.py --source ./examples/sample_molecules.smi \
-    --output_folder /my/folder/ --add_pdb_output --add_html_output
+    --output_folder /my/folder/ --add_pdb_output --add_html_output True
 ```
 
 Save at most two variants per input molecule:
