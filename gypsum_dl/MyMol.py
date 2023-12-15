@@ -599,6 +599,23 @@ class MyMol:
 
         # Remove ones that are very structurally similar.
         self.eliminate_structurally_similar_conformers(rmsd_cutoff)
+    
+    def remain_top_N_conformers(self, num_conformers_to_save):
+        """Remain only the top N conformers to save.
+
+        :param num_conformers_to_save: The number of conformers to save.
+        :type num_conformers_to_save: int
+        """
+
+        # Remain only the top N conformers to save.
+
+        # debug
+        print("#########")
+        print(len(self.conformers))
+
+
+        if len(self.conformers) > num_conformers_to_save:
+            self.conformers = self.conformers[:num_conformers_to_save]
 
     def eliminate_structurally_similar_conformers(self, rmsd_cutoff=0.1):
         """Eliminates conformers that are very geometrically similar.

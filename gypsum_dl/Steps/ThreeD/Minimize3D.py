@@ -151,6 +151,10 @@ def parallel_minit(mol, max_variants_per_compound, thoroughness, second_embed):
     # Not minimizing. Just adding the conformers.
     mol.add_conformers(thoroughness * max_variants_per_compound, 0.1, False)
 
+    # Print a message to the screen.
+    Utils.log(f"minimize 3d conformation: {mol.contnr_idx}, {mol.name}")
+
+
     if len(mol.conformers) > 0:
         # Because it is possible to find a molecule that has no
         # acceptable conformers (i.e., is not possible geometrically).

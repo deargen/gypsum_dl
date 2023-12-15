@@ -195,6 +195,9 @@ def parallel_get_ring_confs(mol, max_variants_per_compound, thoroughness, second
 
     # Make it easier to access the container index.
     contnr_idx = mol.contnr_idx
+    
+    # Print a message to the screen.
+    Utils.log(f"get non-aromatic ring conformations: {mol.contnr_idx}, {mol.name}")
 
     # All the molecules in this container must have nonatomatic rings (because
     # they are all variants of the same source molecule). So just make a new

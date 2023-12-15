@@ -32,6 +32,10 @@ def proccess_output(contnrs, params):
     # Unpack some variables.
     separate_output_files = params["separate_output_files"]
     output_folder = params["output_folder"]
+    num_conformers_to_save = params["max_confs_to_save"]
+
+    # Remain only the top N conformers to save.    
+    reamin_top_N_conformers_to_save(contnrs, num_conformers_to_save)
 
     if params["add_html_output"] == True:
         # Write to an HTML file.
@@ -44,3 +48,18 @@ def proccess_output(contnrs, params):
     if params["add_pdb_output"] == True:
         Utils.log("\nMaking PDB output files\n")
         convert_sdfs_to_PDBs(contnrs, output_folder)
+
+# 
+def reamin_top_N_conformers_to_save(contnrs, num_conformers_to_save):
+    """Remain only the top N conformers to save.
+ 
+    :param contnrs: A list of containers (MolContainer.MolContainer).
+    :type contnrs: list
+    :param num_conformers_to_save: The number of conformers to save.
+    :type num_conformers_to_save: int
+    """
+ 
+    # Remain only the top N conformers to save.
+    for contnr in contnrs:
+        for mol in contnr.mols:
+            mol.remain_top_N_conformers(num_conformers_to_save)

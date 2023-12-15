@@ -64,9 +64,8 @@ def prepare_molecules(args):
     # Keep track of the tim the program starts.
     start_time = datetime.now()
 
-    # A list of command-line parameters that will be ignored if using a json
-    # file.
-    json_warning_list = [
+    # A list of parameters from json file will be ignored if command-line parameters are used.
+    dupulicate_warning_list = [
         "source",
         "output_folder",
         "num_processors",
@@ -78,20 +77,28 @@ def prepare_molecules(args):
         "pka_precision",
     ]
 
-    # Whether to warn the user that the above parameters, if specified, will
-    # be ignored.
-    need_to_print_override_warning = False
-
+    # Set the parameters.
     if "json" in args:
         # "json" is one of the parameters, so we'll be ignoring the rest.
         try:
-            params = json.load(open(args["json"]))
+            params_json = json.load(open(args["json"]))
         except:
             Utils.exception("Is your input json file properly formed?")
 
-        params = set_parameters(params)
-        if [i for i in json_warning_list if i in list(args.keys())]:
-            need_to_print_override_warning = True
+        params_all = params_json.copy()
+
+        # Check for parameters duplicated in the json file and the command-line.
+        for key in list(args.keys()):
+            if key in params_json.keys() and key in dupulicate_warning_list:
+                # This parameter was specified in the json file,
+                # but it will be replaced by the command-line parameter.
+                Utils.log(f"WARNING: {key} was specified in the json file {params_json[key]}, but will be replaced by the command-line parameter {args[key]}.")
+                
+            if key != "json":
+                params_all[key] = args[key]
+
+        params = set_parameters(params_all)
+
     else:
         # We're actually going to use all the command-line parameters. No
         # warning necessary.
@@ -161,11 +168,6 @@ def prepare_molecules(args):
             params["job_manager"], params["num_processors"], True
         )
 
-    # Let the user know that their command-line parameters will be ignored, if
-    # they have specified a json file.
-    if need_to_print_override_warning == True:
-        Utils.log("WARNING: Using the --json flag overrides all other flags.")
-
     # If running in mpi mode, separate_output_files must be set to true.
     if params["job_manager"] == "mpi" and params["separate_output_files"] == False:
         Utils.log(
@@ -222,6 +224,9 @@ def prepare_molecules(args):
     # print("chosen mode  :  ", params["job_manager"])
     # print("Parallel style:  ", params["Parallelizer"].return_mode())
     # print("Number Nodes:  ", params["Parallelizer"].return_node())
+    # print("params")
+    # print("###########################")
+    # print(params)
     # print("###########################")
     # print("")
 
@@ -371,7 +376,7 @@ def set_parameters(params_unicode):
             "separate_output_files": False,
             "add_pdb_output": False,
             "add_html_output": False,
-            "num_processors": -1,
+            "num_processors": 1,
             "start_time": 0,
             "end_time": 0,
             "run_time": 0,
@@ -380,6 +385,7 @@ def set_parameters(params_unicode):
             "pka_precision": 1.0,
             "thoroughness": 3,
             "max_variants_per_compound": 5,
+            "max_confs_to_save": 32,
             "second_embed": False,
             "2d_output_only": False,
             "skip_optimize_geometry": False,

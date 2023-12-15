@@ -101,6 +101,9 @@ def parallel_make_3d(mol):
     # Initially assume you won't show an error message.
     show_error_msg = False
 
+    # Print a message to the screen.
+    Utils.log(f"make 3d conformation: {mol.contnr_idx}, {mol.name}")
+
     if mol.rdkit_mol is None:
         # The rdkit mol is None. Something's gone wrong. Show an error
         # message.
